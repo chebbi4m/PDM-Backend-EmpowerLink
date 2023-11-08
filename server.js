@@ -5,6 +5,8 @@ import cors from 'cors';
 
 
 import userRoutes from './routes/user.js'
+import communityRoutes from './routes/communityRouter.js'
+import experienceRoutes from './routes/experienceRouter.js'
 
 import { errorHandler, notFoundError } from './middlewares/error_handler.js';
 import dotenv from 'dotenv';
@@ -37,10 +39,13 @@ app.use((req,res,next)=>{
   });
   
   app.use('/user', userRoutes);
+  app.use('/community', communityRoutes);
+  app.use('/experience', experienceRoutes);
+
   
   app.use(errorHandler);
   app.use(notFoundError);
   
   app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}/`);
-  });
+  }); 
