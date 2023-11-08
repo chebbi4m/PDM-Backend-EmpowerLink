@@ -5,10 +5,10 @@ const app = express();
 app.use(express.json());
 
 // Import the "Offreemploi" routes
-const offreemploiRoutes = require('./routes/offreemploiRoutes');
+const OpportuniteRoutes = require('./routes/OpportuniteRoutes');
 
 // Use the "Offreemploi" routes under the "/api" base path
-app.use('/api', offreemploiRoutes);
+app.use('/api', OpportuniteRoutes);
 
 mongoose.connect("mongodb://127.0.0.1:27017/empowerlink", {
     useNewUrlParser: true,
