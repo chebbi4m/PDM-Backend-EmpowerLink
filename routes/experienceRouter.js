@@ -31,9 +31,7 @@ router.get('/getExperiences',getExperiences)
 
 router.get('/getMyExperiences',getMyExperiences)
 
-router.get('/getExperiencesByCommunity',[
-    body('communityId').notEmpty()
-],getExperiencesByCommunity)
+router.get('/getExperiencesByCommunity/:communityId', getExperiencesByCommunity);
 
 
 export default router;

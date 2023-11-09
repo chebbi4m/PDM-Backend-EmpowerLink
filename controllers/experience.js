@@ -104,8 +104,18 @@ export const getMyExperiences = async(req, res) => {
     res.status(200).json({ experiences: experience });
 }
 
-export const getExperiencesByCommunity = async(req, res) => {
-    const experinceCommunity = req.body.communityId;
-    const experience = await experienceModel.find({ communityId: experinceCommunity });
-    res.status(200).json({ experiences: experience });
-}
+export const getExperiencesByCommunity = async (req, res) => {
+    const communityId = req.params.communityId; // Update to use params instead of body
+    try {
+        const experiences = await experienceModel.find({ communityId });
+
+        // Send experiences array directly without wrapping
+        res.status(200).json(experiences);
+        console.log(experiences);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+  
