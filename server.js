@@ -10,7 +10,7 @@ import { errorHandler, notFoundError } from './middlewares/error_handler.js';
 import dotenv from 'dotenv';
 dotenv.config();
 const app = express();
-const port = process.env.PORT || 9090 ;
+const port = process.env.PORT || 9090;
 const databaseName = 'pdm';
 mongoose.set('debug', true);
 mongoose.Promise = global.Promise;
@@ -42,5 +42,5 @@ app.use((req,res,next)=>{
   app.use(notFoundError);
   
   app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}/`);
+    console.log(`Server running at http://192.168.139.1:${port}/`);
   });
