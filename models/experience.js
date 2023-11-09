@@ -7,6 +7,10 @@ const experienceSchema = new Schema(
             type:Number,
             required:true
         },
+        communityId:{
+            type:Number,
+            required:true
+        },
         title:{
             type:String,
             required: true

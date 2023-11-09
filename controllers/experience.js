@@ -11,13 +11,14 @@ export const createExperience = async (req, res) => {
                 return res.status(400).json({error:err, message: 'Image upload failed' });
             }
 
-            const { username, title, text } = req.body;
+            const { username, title, text, communityId } = req.body;
             const image = req.file ? req.file.filename : ''; // Check if an image file was uploaded
 
             const experienceId = await generateUniqueExperienceId();
 
             const newExperience = new experienceModel({
                 username,
+                communityId,
                 title,
                 text,
                 image,
@@ -100,5 +101,11 @@ export const getExperiences = async (req, res) => {
 export const getMyExperiences = async(req, res) => {
     const experinceCreator = req.body.username;
     const experience = await experienceModel.find({ username: experinceCreator });
+    res.status(200).json({ experiences: experience });
+}
+
+export const getExperiencesByCommunity = async(req, res) => {
+    const experinceCommunity = req.body.communityId;
+    const experience = await experienceModel.find({ communityId: experinceCommunity });
     res.status(200).json({ experiences: experience });
 }
