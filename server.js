@@ -13,7 +13,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 const app = express();
 const port = process.env.PORT || 9090;
-const port = process.env.PORT || 9090;
 const databaseName = 'pdm';
 mongoose.set('debug', true);
 mongoose.Promise = global.Promise;
