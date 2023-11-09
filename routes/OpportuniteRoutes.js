@@ -1,10 +1,10 @@
-const express = require('express');
+import express from 'express';
 const OpportuniteRoutes = express.Router();
-const OpportuniteController = require('../controllers/OpportuniteController');
+import OpportuniteController from '../controllers/OpportuniteController.js';
 
 OpportuniteRoutes.get('/opportunite', OpportuniteController.getOpportunite);
 OpportuniteRoutes.post('/opportunite', OpportuniteController.createOpportunite);
 OpportuniteRoutes.delete('/opportunite/:id', OpportuniteController.deleteOpportunite);
 OpportuniteRoutes.put('/opportunite/:id', OpportuniteController.updateOpportunite);
 
-module.exports = OpportuniteRoutes;
+export default OpportuniteRoutes;

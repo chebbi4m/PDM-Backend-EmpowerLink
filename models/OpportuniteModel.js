@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const opportuniteModelSchema = new mongoose.Schema({
   title: String,
@@ -9,4 +9,4 @@ const opportuniteModelSchema = new mongoose.Schema({
 
 const Opportunite = mongoose.model('Opportunite', opportuniteModelSchema);
 
-module.exports = Opportunite;
+export default Opportunite;

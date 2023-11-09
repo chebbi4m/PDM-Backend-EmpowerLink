@@ -39,7 +39,7 @@ app.use((req,res,next)=>{
   });
   
   // Import the "Offreemploi" routes
-  const OpportuniteRoutes = require('./routes/OpportuniteRoutes');
+  import OpportuniteRoutes from './routes/OpportuniteRoutes.js';
 
   // Use the "Offreemploi" routes under the "/api" base path
   app.use('/api', OpportuniteRoutes);

@@ -1,6 +1,6 @@
-const Opportunite = require('../models/OpportuniteModel');
+import Opportunite from '../models/OpportuniteModel.js';
 
-exports.getOpportunite = (req, res) => {
+export const getOpportunite = (req, res) => {
   Opportunite.find()
     .then(opportunite => {
       res.json(opportunite);
@@ -10,7 +10,7 @@ exports.getOpportunite = (req, res) => {
     });
 };
 
-exports.createOpportunite = (req, res) => {
+export const createOpportunite = (req, res) => {
   const newOpportunite = new Opportunite(req.body);
   newOpportunite.save()
     .then(opportunite => {
@@ -21,7 +21,7 @@ exports.createOpportunite = (req, res) => {
     });
 };
 
-exports.deleteOpportunite = (req, res) => {
+export const deleteOpportunite = (req, res) => {
   const opportuniteId = req.params.id;
 
   Opportunite.findByIdAndRemove(opportuniteId)
@@ -37,7 +37,7 @@ exports.deleteOpportunite = (req, res) => {
     });
 };
 
-exports.updateOpportunite = (req, res) => {
+export const updateOpportunite = (req, res) => {
   const opportuniteId = req.params.id;
 
   Opportunite.findByIdAndUpdate(opportuniteId, req.body, { new: true })
@@ -52,3 +52,13 @@ exports.updateOpportunite = (req, res) => {
       res.status(500).json(err);
     });
 };
+
+// Named export for default export
+const OpportuniteController = {
+  getOpportunite,
+  createOpportunite,
+  deleteOpportunite,
+  updateOpportunite,
+};
+
+export default OpportuniteController;
