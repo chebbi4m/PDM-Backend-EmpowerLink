@@ -1,7 +1,7 @@
 import express from 'express';
 import { body } from 'express-validator';
 import { registerUser,loginUser } from '../controllers/AuthController.js';
-import {  editProfile,getAllUsers ,sendPasswordResetCode,changePassword,verifyResetCode} from '../controllers/user.js';
+import { changepassword, editProfile,getAllUsers ,sendPasswordResetCode} from '../controllers/user.js';
 import { banUser, ban, checkBanned } from '../controllers/ban.js';
 
 const router = express.Router();
@@ -31,8 +31,7 @@ router.get('/profile', checkBanned, (req, res) => {
 });
 router.post('/:username/ban', banUser,ban);
 router.get('/checkBanned', checkBanned);
-router.post('/resetcode', verifyResetCode);
-router.post('/changerpassword', changePassword);
+router.post('/changepassword/:userId',changepassword)
 
 
 export default router;

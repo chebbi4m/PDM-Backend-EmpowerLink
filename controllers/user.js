@@ -96,70 +96,7 @@ export const getAllUsers = async (req, res) => {
       res.json({ error: 'An error occurred' });
     }
   };
-
-  export const verifyResetCode = async (req, res) => {
-    try {
-      const email = req.body.email;
-      const resetCode = req.body.resetCode;
-  
-      const user = await UserModel.findOne({ email: email });
-  
-      if (!user) {
-        return res.status(404).json({ error: 'User not found' });
-      }
-  
-      if (user.restcode !== resetCode) {
-        return res.status(400).json({ error: 'Invalid reset code' });
-      }
-  
-      res.status(200).json({ message: 'Reset code verified successfully', userId: user._id });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'An error occurred' });
-    }
-  };
-
-
-  export const changePassword = async (req, res) => {
-    try {
-      const userId = req.body.userId;
-      const newPassword = req.body.password;
-  
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(newPassword, salt);
-  
-      const user = await UserModel.findById(userId);
-  
-      if (!user) {
-        return res.status(404).json({ error: 'User not found' });
-      }
-  
-      // Mettre à jour le mot de passe pour l'utilisateur avec le nouveau mot de passe hashé
-      user.password = hashedPassword;
-      await user.save();
-  
-      res.status(200).json({ message: 'Password changed successfully' });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'An error occurred' });
-    }
-  };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  /*export const changepassword =async(req,res)=>{
+  export const changepassword =async(res,req)=>{
 
     try {
       const id = req.params;
@@ -181,4 +118,4 @@ export const getAllUsers = async (req, res) => {
     console.log(error);
     res.status(400).json({ error });
   }
-  };*/
+  };

@@ -5,14 +5,13 @@ import cors from 'cors';
 
 
 import userRoutes from './routes/user.js'
-import communityRoutes from './routes/communityRouter.js'
-import experienceRoutes from './routes/experienceRouter.js'
+import servicesRoutes from './routes/serviceSociauxRoute.js'
 
 import { errorHandler, notFoundError } from './middlewares/error_handler.js';
 import dotenv from 'dotenv';
 dotenv.config();
 const app = express();
-const port = process.env.PORT || 9090;
+const port = process.env.PORT || 9090  ;
 const databaseName = 'pdm';
 mongoose.set('debug', true);
 mongoose.Promise = global.Promise;
@@ -38,21 +37,12 @@ app.use((req,res,next)=>{
     next();
   });
   
-  // Import the "Offreemploi" routes
-  const OpportuniteRoutes = require('./routes/OpportuniteRoutes');
-
-  // Use the "Offreemploi" routes under the "/api" base path
-  app.use('/api', OpportuniteRoutes);
   app.use('/user', userRoutes);
-  app.use('/community', communityRoutes);
-  app.use('/experience', experienceRoutes);
-
+  app.use("/service", servicesRoutes);
   
   app.use(errorHandler);
   app.use(notFoundError);
   
   app.listen(port, () => {
-    console.log(`Server running at http://192.168.139.1:${port}/`);
-
-    console.log(`Server running at http://192.168.139.1:${port}/`);
+    console.log(`Server running at http://localhost:${port}/`);
   });
