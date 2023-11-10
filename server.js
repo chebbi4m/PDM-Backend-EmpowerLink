@@ -2,7 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import morgan from 'morgan';
 import cors from 'cors';
-
+ 
 
 import userRoutes from './routes/user.js'
 import servicesRoutes from './routes/serviceSociauxRoute.js'
@@ -44,8 +44,6 @@ app.use((req,res,next)=>{
   app.use('/api', OpportuniteRoutes);
   app.use('/user', userRoutes);
   app.use("/service", servicesRoutes);
-  app.use('/formation', Formation);
-  app.use('/education', Education);
   
   app.use(errorHandler);
   app.use(notFoundError);
