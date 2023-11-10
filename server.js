@@ -44,6 +44,8 @@ app.use((req,res,next)=>{
   app.use('/api', OpportuniteRoutes);
   app.use('/user', userRoutes);
   app.use("/service", servicesRoutes);
+  app.use('/formation', Formation);
+  app.use('/education', Education);
   
   app.use(errorHandler);
   app.use(notFoundError);
