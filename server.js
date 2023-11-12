@@ -16,7 +16,7 @@ const databaseName = 'pdm';
 mongoose.set('debug', true);
 mongoose.Promise = global.Promise;
 mongoose
-  .connect(`mongodb://0.0.0.0:27017/${databaseName}`)
+  .connect(`mongodb+srv://chebbi6m:55554471@pdm.r5bim2n.mongodb.net/${databaseName}`)
   .then(() => {
     console.log(`Connected to ${databaseName}`);
   })
