@@ -5,6 +5,7 @@ import { validationResult } from 'express-validator';
 import express from 'express';
 import session from 'express-session';
 import sendEmail from "../utils/sendEmail.js";
+import { token } from "morgan";
 
 
 
@@ -79,8 +80,15 @@ export const loginUser = async (req, res) => {
        
         const secretKey = process.env.JWT_SECRET || 'defaultSecret'; // Utilisez votre propre clé secrète ici
         const token = jwt.sign(
-            { username: user.username, email: user.email },
-            secretKey
+            {
+                userId: user._id,
+                username: user.username,
+                email: user.email,
+                role: user.role,
+                token:user.JWT_KEY // Ajoutez d'autres informations utilisateur au besoin
+            },
+            secretKey,
+            { expiresIn: '1h' }
         );
     
 

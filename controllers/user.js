@@ -84,7 +84,7 @@ export const getAllUsers = async (req, res) => {
       }
      console.log(email);
   
-      const resetCode = nanoid(5).toUpperCase();
+      const resetCode = generateRandomNumericCode(4);
       user.restcode = resetCode;
       await user.save();
   
@@ -96,7 +96,13 @@ export const getAllUsers = async (req, res) => {
       res.json({ error: 'An error occurred' });
     }
   };
-
+  function generateRandomNumericCode(length) {
+    let code = '';
+    for (let i = 0; i < length; i++) {
+        code += Math.floor(Math.random() * 10); // Ajoute un chiffre aléatoire à la chaîne
+    }
+    return code;
+}
   export const verifyResetCode = async (req, res) => {
     try {
       const email = req.body.email;
@@ -122,13 +128,13 @@ export const getAllUsers = async (req, res) => {
 
   export const changePassword = async (req, res) => {
     try {
-      const userId = req.body.userId;
+      const userEmail = req.body.email; // Change userId to userEmail
       const newPassword = req.body.password;
   
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(newPassword, salt);
   
-      const user = await UserModel.findById(userId);
+      const user = await UserModel.findOne({ email: userEmail }); // Use findOne with email
   
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
