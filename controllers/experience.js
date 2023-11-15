@@ -100,13 +100,17 @@ export const getExperiences = async (req, res) => {
 
 export const getExperiencesSortedByDate = async (req, res) => {
     try {
-        const experiences = await experienceModel.find().sort({ date: -1 });
+        const experiences = await experienceModel.find()
+            .sort({ createdAt: -1 }); // Sorting by createdAt field in descending order (newest to oldest)
+        
         res.status(200).json({ experiences });
     } catch (error) {
-        console.error(error);
+        console.error('Error fetching experiences:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
-}
+};
+
+
 
 
 export const getMyExperiences = async(req, res) => {

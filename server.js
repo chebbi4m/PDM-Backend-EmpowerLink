@@ -7,7 +7,7 @@ import cors from 'cors';
 import userRoutes from './routes/user.js'
 import servicesRoutes from './routes/serviceSociauxRoute.js'
 import ExperienceRoutes from './routes/experienceRouter.js'
-import CommunityRoutes from './routes/experienceRouter.js'
+import CommunityRoutes from './routes/communityRouter.js'
 
 import { errorHandler, notFoundError } from './middlewares/error_handler.js';
 import dotenv from 'dotenv';
