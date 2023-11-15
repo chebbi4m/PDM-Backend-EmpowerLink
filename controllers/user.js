@@ -7,12 +7,12 @@ import bcrypt from 'bcrypt';
 import sendEmail from "../utils/sendEmail.js";
 
 export const editProfile = async (req, res) => {
-    const userId = req.params.userId; // Supposons que vous utilisez un paramètre dans l'URL pour identifier l'utilisateur
-    const { username, email, firstname, lastname, address ,birthday , number } = req.body;
+    const userId = req.body.userId; // Assuming the user ID is passed in the request body
+    const { username, email, firstname, lastname, address, birthday, number } = req.body;
 
     try {
         // Recherche de l'utilisateur dans la base de données
-        const user = await UserModel.findById(userId);
+        const user = await UserModel.findById(userId); // Change here to use userId from the request body
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
@@ -27,7 +27,6 @@ export const editProfile = async (req, res) => {
         user.birthday = birthday || user.birthday;
         user.number = number || user.number;
 
-
         // Sauvegarde des modifications
         const updatedUser = await user.save();
 
@@ -36,6 +35,7 @@ export const editProfile = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
 
 
 export const getAllUsers = async (req, res) => {
