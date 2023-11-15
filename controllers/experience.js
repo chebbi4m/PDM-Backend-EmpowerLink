@@ -98,6 +98,17 @@ export const getExperiences = async (req, res) => {
     res.status(200).json({ experiences: experience });
 }
 
+export const getExperiencesSortedByDate = async (req, res) => {
+    try {
+        const experiences = await experienceModel.find().sort({ date: -1 });
+        res.status(200).json({ experiences });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+
+
 export const getMyExperiences = async(req, res) => {
     const experinceCreator = req.body.username;
     const experience = await experienceModel.find({ username: experinceCreator });

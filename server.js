@@ -6,6 +6,8 @@ import cors from 'cors';
 
 import userRoutes from './routes/user.js'
 import servicesRoutes from './routes/serviceSociauxRoute.js'
+import ExperienceRoutes from './routes/experienceRouter.js'
+import CommunityRoutes from './routes/experienceRouter.js'
 
 import { errorHandler, notFoundError } from './middlewares/error_handler.js';
 import dotenv from 'dotenv';
@@ -44,6 +46,8 @@ app.use((req,res,next)=>{
   app.use('/api', OpportuniteRoutes);
   app.use('/user', userRoutes);
   app.use("/service", servicesRoutes);
+  app.use('/community', CommunityRoutes);
+  app.use("/experience", ExperienceRoutes);
   
   app.use(errorHandler);
   app.use(notFoundError);
