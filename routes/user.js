@@ -21,7 +21,7 @@ router.post('/login', [
 
 
 router.put(
-    '/users/:userId', editProfile);
+    '/editprofile', editProfile);
 router.get('/getuser',getAllUsers);
 
 
