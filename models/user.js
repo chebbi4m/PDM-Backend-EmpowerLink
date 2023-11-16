@@ -37,6 +37,8 @@ const userSchema = new Schema(
             required: false,
 
         },
+        followers: [],
+        following: [],
         birthday:{
             type: Date
 

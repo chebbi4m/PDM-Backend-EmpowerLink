@@ -2,6 +2,8 @@ import UserModel from "../models/user.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { validationResult } from 'express-validator';
+import passport from 'passport';
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import express from 'express';
 import session from 'express-session';
 import sendEmail from "../utils/sendEmail.js";
@@ -64,6 +66,9 @@ export const loginUser = async (req, res) => {
 
     try {
         const user = await UserModel.findOne({ email });
+        if (req.user && req.user.googleId) {
+            return res.status(200).json({ message: 'Successfully logged in with Google', user: req.user });
+          }
 
         if (!user) {
             return res.status(401).json({ message: 'Invalid email or password' });
@@ -102,5 +107,51 @@ export const loginUser = async (req, res) => {
     }
     
 };
+passport.use(
+    new GoogleStrategy(
+      {
+        clientID: 'votre_client_id',
+        clientSecret: 'votre_client_secret',
+        callbackURL: 'http://votre_domaine/auth/google/callback', // Assurez-vous de le configurer correctement sur la console Google Developer
+      },
+      async (accessToken, refreshToken, profile, done) => {
+        try {
+          // Vérifiez si l'utilisateur existe déjà dans la base de données
+          let user = await UserModel.findOne({ googleId: profile.id });
+  
+          if (!user) {
+            // Si l'utilisateur n'existe pas, créez un nouvel utilisateur dans la base de données
+            user = new UserModel({
+              googleId: profile.id,
+              username: profile.displayName,
+              // Ajoutez d'autres champs que vous souhaitez récupérer depuis le profil Google
+            });
+  
+            await user.save();
+          }
+  
+          // Retournez l'utilisateur trouvé ou nouvellement créé
+          return done(null, user);
+        } catch (error) {
+          return done(error, null);
+        }
+      }
+    )
+  );
+  
+  // Sérialisez l'utilisateur dans la session
+  passport.serializeUser((user, done) => {
+    done(null, user.id);
+  });
+  
+  // Désérialisez l'utilisateur depuis la session
+  passport.deserializeUser(async (id, done) => {
+    try {
+      const user = await UserModel.findById(id);
+      done(null, user);
+    } catch (error) {
+      done(error, null);
+    }
+  });
 
 

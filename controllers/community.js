@@ -7,7 +7,7 @@ export const createCommunity = async (req, res) => {
     console.log("aaaaaa")
      
     try {
-        const communityExists = await communityModel.findOne({ name });
+        
         const { 
             username,
             name,
@@ -15,6 +15,7 @@ export const createCommunity = async (req, res) => {
             objectif,
             image
         } = req.body;
+        const communityExists = await communityModel.findOne({ name });
 
         // Check if community name already exists
         console.log("aaaaaa")

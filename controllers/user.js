@@ -27,6 +27,9 @@ export const editProfile = async (req, res) => {
         user.birthday = birthday || user.birthday;
         user.number = number || user.number;
         user.description = description || user.description;
+        if (req.file) {
+          user.image = req.file.path; // Save the file path or any identifier in your database
+      }
 
         // Sauvegarde des modifications
         const updatedUser = await user.save();
@@ -189,3 +192,53 @@ export const getAllUsers = async (req, res) => {
     res.status(400).json({ error });
   }
   };*/
+
+ // userController.js
+export const followUser = async (req, res) => {
+  const { targetUserId } = req.body; // Utilisez targetUserId pour éviter toute confusion avec le paramètre d'URL
+  const { _id } = req.user; // Utilisez req.user pour obtenir l'ID de l'utilisateur actuel
+
+  if (targetUserId === _id) {
+    return res.status(403).json("Action Forbidden");
+  }
+
+  try {
+    const targetUser = await UserModel.findById(targetUserId);
+    const currentUser = await UserModel.findById(_id);
+
+    if (!targetUser.followers.includes(_id)) {
+      await targetUser.updateOne({ $push: { followers: _id } });
+      await currentUser.updateOne({ $push: { following: targetUserId } });
+      res.status(200).json("User followed!");
+    } else {
+      res.status(403).json("You are already following this user");
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error);
+  }
+};
+
+export const unfollowUser = async (req, res) => {
+  const { targetUserId } = req.body; // Utilisez targetUserId pour éviter toute confusion avec le paramètre d'URL
+  const { _id } = req.user; // Utilisez req.user pour obtenir l'ID de l'utilisateur actuel
+
+  if (targetUserId === _id) {
+    return res.status(403).json("Action Forbidden");
+  }
+
+  try {
+    const targetUser = await UserModel.findById(targetUserId);
+    const currentUser = await UserModel.findById(_id);
+
+    if (targetUser.followers.includes(_id)) {
+      await targetUser.updateOne({ $pull: { followers: _id } });
+      await currentUser.updateOne({ $pull: { following: targetUserId } });
+      res.status(200).json("Unfollowed successfully!");
+    } else {
+      res.status(403).json("You are not following this user");
+    }
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
