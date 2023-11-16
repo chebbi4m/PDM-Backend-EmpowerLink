@@ -2,7 +2,12 @@ import communityModel from "../models/community.js";
 import { validationResult } from 'express-validator';
 
 export const createCommunity = async (req, res) => {
+    console.log("aaaaaa")
+    console.log(req.body.username)
+    console.log("aaaaaa")
+     
     try {
+        const communityExists = await communityModel.findOne({ name });
         const { 
             username,
             name,
@@ -12,7 +17,10 @@ export const createCommunity = async (req, res) => {
         } = req.body;
 
         // Check if community name already exists
-        const communityExists = await communityModel.findOne({ name });
+        console.log("aaaaaa")
+        console.log(req.body.username)
+        console.log("aaaaaa")
+        
 
         if (communityExists) {
             return res.status(400).json({ message: "Community name already exists, choose another name" });

@@ -8,7 +8,7 @@ import sendEmail from "../utils/sendEmail.js";
 
 export const editProfile = async (req, res) => {
     const userId = req.body.userId; // Assuming the user ID is passed in the request body
-    const { username, email, firstname, lastname, address, birthday, number } = req.body;
+    const { username, email, firstname, lastname, address, birthday, number,description } = req.body;
 
     try {
         // Recherche de l'utilisateur dans la base de données
@@ -26,6 +26,7 @@ export const editProfile = async (req, res) => {
         user.adress = address || user.adress;
         user.birthday = birthday || user.birthday;
         user.number = number || user.number;
+        user.description = description || user.description;
 
         // Sauvegarde des modifications
         const updatedUser = await user.save();
