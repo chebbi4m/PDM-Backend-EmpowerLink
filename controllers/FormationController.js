@@ -1,4 +1,3 @@
-import axios from 'axios';
 import Formation from '../models/formation.js';
 import multer from 'multer';
 import fs from 'fs';
@@ -18,6 +17,7 @@ const storage = multer.diskStorage({
     cb(null, file.originalname);
   },
 });
+
 
 const upload = multer({ storage: storage }).any();
 
@@ -61,10 +61,7 @@ export const uploadImages = async (req, res) => {
   });
 };
 
-export const getAllformations = async (req, res) => {
-    var formations = await Formation.find();
-    res.status(200).send({ formations });
-};    
+    
 
 export const getFormationById = async (req, res) => {
   const id = req.headers.idformation;
@@ -112,5 +109,36 @@ export const removeFormation = async (req, res) => {
     res.status(204).send();
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+};
+export const getAllformations = async (req, res) => {
+  var formations = await Formation.find();
+  res.status(200).send(formations);
+};
+export const addParticipant = async (req, res) => {
+  const formationId = req.body.formationId; 
+  const userId = req.body.userId; 
+
+  try {
+    // Find the formation by ID
+    const formation = await Formation.findById(formationId);
+
+    if (!formation) {
+      return res.status(404).json({ message: 'Formation not found' });
+    }
+
+    // Add the user ID to the participants array
+    formation.participants.push(userId);
+
+    // Update the number of participants (optional)
+    formation.nbParticipant = formation.participants.length;
+
+    // Save the updated formation
+    await formation.save();
+
+    return res.status(200).json({message: 'Participant added successfully' ,formation});
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Internal Server Error' });
   }
 };

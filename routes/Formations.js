@@ -6,6 +6,7 @@ import {
   getFormationById, 
   removeFormation,
   updateFormation,
+  addParticipant,
 } from '../controllers/FormationController.js';
 
 import multer from 'multer';
@@ -39,6 +40,7 @@ router.get('/all', getAllformations); // Corrected function name
 router.get('/', getFormationById); // Corrected function name
 
 router.post('/delete', removeFormation);
+router.post('/addParticipant', addParticipant);
 
 router.put('/update', upload.single('image'), updateFormation);
 

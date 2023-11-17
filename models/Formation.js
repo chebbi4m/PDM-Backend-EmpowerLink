@@ -7,11 +7,11 @@ const FormationSchema = new Schema(
       type: String,
     },
     nbPlace: {
-      default: null,
+      default: 0,
       type: Number,
     },
     nbParticipant: {
-      default: null,
+      default: 1,
       type: Number,
     },
     description: {
@@ -22,6 +22,11 @@ const FormationSchema = new Schema(
       default: 'image',
       type: String,
     },
+    participants: [{
+      type: Schema.Types.ObjectId,
+      ref : "User",
+      default: []
+    }],
   },
   {
     timestamps: { currentTime: () => Date.now() },

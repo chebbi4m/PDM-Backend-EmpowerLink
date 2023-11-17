@@ -8,6 +8,8 @@ import userRoutes from './routes/user.js'
 import servicesRoutes from './routes/serviceSociauxRoute.js'
 import ExperienceRoutes from './routes/experienceRouter.js'
 import CommunityRoutes from './routes/communityRouter.js'
+import FormationRoute from './routes/Formations.js'
+import EducationRoute from './routes/Educations.js'
 
 import { errorHandler, notFoundError } from './middlewares/error_handler.js';
 import dotenv from 'dotenv';
@@ -48,6 +50,9 @@ app.use((req,res,next)=>{
   app.use("/service", servicesRoutes);
   app.use('/community', CommunityRoutes);
   app.use("/experience", ExperienceRoutes);
+  app.use("/formation",FormationRoute)
+  app.use("/education", EducationRoute)
+  
   
   app.use(errorHandler);
   app.use(notFoundError);
