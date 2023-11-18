@@ -7,6 +7,7 @@ import {
   removeFormation,
   updateFormation,
   addParticipant,
+  getFormationsByUserId,
 } from '../controllers/FormationController.js';
 
 import multer from 'multer';
@@ -43,5 +44,6 @@ router.post('/delete', removeFormation);
 router.post('/addParticipant', addParticipant);
 
 router.put('/update', upload.single('image'), updateFormation);
+router.get('/formations', getFormationsByUserId);
 
 export default router;

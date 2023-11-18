@@ -2,6 +2,8 @@ import Formation from '../models/formation.js';
 import multer from 'multer';
 import fs from 'fs';
 import path from 'path';
+import User from '../models/user.js';
+
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -140,5 +142,25 @@ export const addParticipant = async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+export const getFormationsByUserId = async (req, res) => {
+  const userId = req.body.userId; // Assuming the user ID is passed in the request body
+
+  try {
+    // Find the user by ID
+    const user = await User.findById(userId); // Fix the typo: change 'user' to 'User'
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Find formations where the user is a participant
+    const formations = await Formation.find({ participants: userId }); // Simplify the query
+
+    res.status(200).json(formations);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 };

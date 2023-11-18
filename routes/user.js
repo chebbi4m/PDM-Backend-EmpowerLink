@@ -2,7 +2,7 @@ import express from 'express';
 import passport from 'passport';
 import { body } from 'express-validator';
 import { registerUser,loginUser } from '../controllers/AuthController.js';
-import {  editProfile,getAllUsers ,sendPasswordResetCode,changePassword,verifyResetCode,followUser,unfollowUser} from '../controllers/user.js';
+import {  editProfile,getAllUsers ,sendPasswordResetCode,changePassword,verifyResetCode,followUser,unfollowUser, addSkills,getSkills} from '../controllers/user.js';
 import { banUser, ban, checkBanned } from '../controllers/ban.js';
 
 const router = express.Router();
@@ -36,6 +36,8 @@ router.post('/resetcode', verifyResetCode);
 router.post('/changerpassword', changePassword);
 router.put("/follow",  followUser);
 router.put("/unfollow", unfollowUser);
+router.post("/addskills", addSkills)
+router.get('/skills/:userId', getSkills);
 router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 // Ajoutez cette route pour la redirection après l'authentification Google

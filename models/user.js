@@ -37,6 +37,12 @@ const userSchema = new Schema(
             required: false,
 
         },
+        skills: [
+            {
+                type: String,
+                required: false
+            }
+        ],
         followers: [],
         following: [],
         birthday:{

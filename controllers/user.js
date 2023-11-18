@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
 import { nanoid } from 'nanoid';
 import bcrypt from 'bcrypt';
+import { validationResult, check } from 'express-validator';
 
 import sendEmail from "../utils/sendEmail.js";
 
@@ -195,7 +196,7 @@ export const getAllUsers = async (req, res) => {
 
  // userController.js
 export const followUser = async (req, res) => {
-  const { targetUserId } = req.body; // Utilisez targetUserId pour éviter toute confusion avec le paramètre d'URL
+  const { UserId } = req.body; // Utilisez targetUserId pour éviter toute confusion avec le paramètre d'URL
   const { _id } = req.user; // Utilisez req.user pour obtenir l'ID de l'utilisateur actuel
 
   if (targetUserId === _id) {
@@ -203,12 +204,12 @@ export const followUser = async (req, res) => {
   }
 
   try {
-    const targetUser = await UserModel.findById(targetUserId);
+    const targetUser = await UserModel.findById(UserId);
     const currentUser = await UserModel.findById(_id);
 
     if (!targetUser.followers.includes(_id)) {
       await targetUser.updateOne({ $push: { followers: _id } });
-      await currentUser.updateOne({ $push: { following: targetUserId } });
+      await currentUser.updateOne({ $push: { following: UserId } });
       res.status(200).json("User followed!");
     } else {
       res.status(403).json("You are already following this user");
@@ -240,5 +241,54 @@ export const unfollowUser = async (req, res) => {
     }
   } catch (error) {
     res.status(500).json(error);
+  }
+};
+export const addSkills = async (req, res) => {
+  const userId = req.body.userId; // Assuming the user ID is passed in the request body
+  const { skills } = req.body;
+
+  try {
+      // Validate the skills input if needed
+      // For example, you can use express-validator for this purpose
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+          return res.status(422).json({ errors: errors.array() });
+      }
+
+      // Find the user in the database
+      const user = await UserModel.findById(userId);
+
+      if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+      }
+
+      // Add skills to the user's profile
+      user.skills = user.skills.concat(skills);
+
+      // Save the updated user profile
+      const updatedUser = await user.save();
+
+      res.status(200).json({ user: updatedUser, message: 'Skills added successfully' });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: error.message });
+  }
+};
+export const getSkills = async (req, res) => {
+  const userId = req.params.userId; // Assuming the user ID is passed in the request parameters
+
+  try {
+    // Find the user in the database
+    const user = await UserModel.findById(userId);
+    console.log('Received request for user ID:', userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Return the skills of the user
+    res.status(200).json({ skills: user.skills });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
   }
 };
