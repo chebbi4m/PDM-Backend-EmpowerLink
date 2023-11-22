@@ -1,40 +1,44 @@
 import experienceModel from '../models/experience.js';
 import { validationResult } from 'express-validator';
 import multer from '../middlewares/multer-config.js'; // Import your Multer configuration
+import { generateUniqueExperienceId } from './your-other-controller.js'; // Import your function
+
 
 export const createExperience = async (req, res) => {
     try {
-        // Use the Multer middleware directly (do not call it as a function)
-        multer.single('image')(req, res, async function (err) {
-            if (err) {
-                console.error('Multer error:', err);
-                return res.status(400).json({error:err, message: 'Image upload failed' });
-            }
-
-            const { username, title, text, communityId } = req.body;
-            const image = req.file ? req.file.filename : ''; // Check if an image file was uploaded
-
-            const experienceId = await generateUniqueExperienceId();
-
-            const newExperience = new experienceModel({
-                username,
-                communityId,
-                title,
-                text,
-                image,
-                experienceId,
-                createdAt: new Date(),
-            });
-
-            const savedExperience = await newExperience.save();
-
-            res.status(201).json({ message: 'Experience created successfully', experience: savedExperience });
+      multer.single('image')(req, res, async function (err) {
+        if (err) {
+          console.error('Multer error:', err);
+          return res.status(400).json({ error: err, message: 'Image upload failed' });
+        }
+  
+        const { username, title, text, communityId } = req.body;
+        const image = req.file ? req.file.filename : '';
+  
+        const experienceId = await generateUniqueExperienceId();
+  
+        const newExperience = new experienceModel({
+          username,
+          communityId,
+          title,
+          text,
+          image,
+          experienceId,
+          createdAt: new Date(),
         });
+  
+        const savedExperience = await newExperience.save();
+  
+        // Emit a socket event to notify connected clients
+        io.emit('newExperience', savedExperience);
+  
+        res.status(201).json({ message: 'Experience created successfully', experience: savedExperience });
+      });
     } catch (error) {
-        console.error('Create experience error:', error);
-        res.status(500).json({ message: error.message });
+      console.error('Create experience error:', error);
+      res.status(500).json({ message: error.message });
     }
-};
+  };
 
 
 
@@ -97,6 +101,21 @@ export const getExperiences = async (req, res) => {
     const experience = await experienceModel.find();
     res.status(200).json({ experiences: experience });
 }
+
+export const getExperiencesSortedByDate = async (req, res) => {
+    try {
+        const experiences = await experienceModel.find()
+            .sort({ createdAt: -1 }); // Sorting by createdAt field in descending order (newest to oldest)
+        
+        res.status(200).json({ experiences });
+    } catch (error) {
+        console.error('Error fetching experiences:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+
+
 
 export const getMyExperiences = async(req, res) => {
     const experinceCreator = req.body.username;

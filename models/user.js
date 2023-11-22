@@ -28,11 +28,23 @@ const userSchema = new Schema(
             type:String,
             required:false
         },
+        description:{
+            type:String,
+            required:false
+        },
         number:{
             type: Number,
             required: false,
 
         },
+        skills: [
+            {
+                type: String,
+                required: false
+            }
+        ],
+        followers: [],
+        following: [],
         birthday:{
             type: Date
 
