@@ -5,10 +5,12 @@ import {
   deleteServiceSociaux,
   createServiceSociaux,
   updateServiceSociaux,
+  addhopital,
 } from "../controllers/serviceSociauxController.js";
 
 const router = express.Router();
 
+router.post('/addhopital', addhopital);
 router.route("/add").post(createServiceSociaux);
 router.route("/all").get(getServiceSociaux);
 router.route("/serviceSociaux/:id").get(getServiceSociauxById);

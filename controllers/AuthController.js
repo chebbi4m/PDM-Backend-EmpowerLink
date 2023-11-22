@@ -91,6 +91,7 @@ export const loginUser = async (req, res) => {
                 email: user.email,
                 role: user.role,
                 description: user.description,
+                image: user.image,
                 token:user.JWT_KEY // Ajoutez d'autres informations utilisateur au besoin
             },
             secretKey,

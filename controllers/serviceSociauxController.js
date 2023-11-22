@@ -43,6 +43,34 @@ const createServiceSociaux = asyncHandler(async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
+export const addhopital = async (req, res) => {
+  const hopitalId = req.body.formationId; 
+  const userId = req.body.userId; 
+
+  try {
+    // Find the hopital by ID
+    const hopital = await hopital.findById(hopitalId);
+
+    if (!hopital) {
+      return res.status(404).json({ message: 'hopital not found' });
+    }
+
+    // Add the user ID to the participants array
+    hopital.participants.push(userId);
+
+    // Update the number of participants (optional)
+    hopital.nbParticipant = hopital.participants.length;
+
+    // Save the updated hopital
+    await hopital.save();
+
+    return res.status(200).json({message: 'Participant added successfully' ,hopital});
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
 
 // @desc    Update Service Sociaux
 // @route   PUT /serviceSociaux/:id

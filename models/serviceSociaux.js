@@ -10,6 +10,19 @@ const serviceSociauxSchema = new Schema({
     type: String,
     required: true
   },
+  participants: [{
+    type: Schema.Types.ObjectId,
+    ref : "User",
+    default: []
+  }],
+  nbPlace: {
+    default: 0,
+    type: Number,
+  },
+  nbParticipant: {
+    default: 1,
+    type: Number,
+  },
   lieu: {
     type: String,
     required: false

@@ -3,7 +3,7 @@ import { diskStorage } from 'multer';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
-const MIME_TYPES = {
+export const MIME_TYPES = {
     'image/jpg': 'jpg',
     'image/jpeg': 'jpeg',
     'image/png': 'png',
@@ -25,5 +25,5 @@ const upload = multer({
     storage: storage,
     limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
 });
-
+export { upload }; 
 export default upload;

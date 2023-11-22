@@ -4,6 +4,7 @@ import nodemailer from 'nodemailer';
 import { nanoid } from 'nanoid';
 import bcrypt from 'bcrypt';
 import { validationResult, check } from 'express-validator';
+import { MIME_TYPES } from "../middlewares/multer-config.js"
 
 import sendEmail from "../utils/sendEmail.js";
 
@@ -129,6 +130,29 @@ export const getAllUsers = async (req, res) => {
       res.status(500).json({ error: 'An error occurred' });
     }
   };
+ export const searchUsersByName = async (req, res) => {
+    const searchName = req.query.name; // Use req.query to get query parameters
+
+    try {
+        const users = await UserModel.find({
+            $or: [
+                { username: { $regex: searchName, $options: 'i' } },
+                { firstname: { $regex: searchName, $options: 'i' } },
+                { lastname: { $regex: searchName, $options: 'i' } },
+            ],
+        });
+
+        if (users.length === 0) {
+            return res.status(404).json({ message: 'No users found with the given name' });
+        }
+
+        res.status(200).json(users);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: error.message });
+    }
+};
+
 
 
   export const changePassword = async (req, res) => {
@@ -155,10 +179,57 @@ export const getAllUsers = async (req, res) => {
       res.status(500).json({ error: 'An error occurred' });
     }
   };
+  // Fonction pour vérifier le type MIME valide
+const isValidMimeType = (mimeType) => {
+  // Logique de validation du type MIME, par exemple en utilisant la bibliothèque `mime-types`
+  // ...
+  return true; // ou false en fonction du résultat de la validation
+};
 
+// Fonction pour supprimer une image du disque
+const deleteOldImage = (imagePath) => {
+  // Logique pour supprimer l'image du disque
+  // ...
+};
 
+export const updateProfilePhoto = async (req, res) => {
+  const userId = req.params.userId;
+  console.log(userId);
 
+  try {
+      const user = await UserModel.findById(userId);
 
+      if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+      }
+
+      // Gestion du téléchargement de la photo de profil
+      if (req.file) {
+          const imagePath = req.file.path;
+
+          // Vérifier si le fichier est une image avec un type MIME valide
+          const mimeType = req.file.mimetype;
+          if (!isValidMimeType(mimeType)) {
+              return res.status(400).json({ message: 'Invalid file type' });
+          }
+
+          // Supprimer l'ancienne image du disque si elle existe
+          if (user.image) {
+              deleteOldImage(user.image);
+          }
+
+          // Vous pouvez stocker le chemin de fichier ou un identifiant dans votre base de données
+          user.image = imagePath;
+          const updatedUser = await user.save();
+          return res.status(200).json({ user: updatedUser, message: 'Profile photo updated successfully' });
+      } else {
+          return res.status(400).json({ message: 'No file uploaded' });
+      }
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Internal server error' });
+  }
+};
 
 
 
@@ -292,3 +363,22 @@ export const getSkills = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const getUserByName = async (req, res) => {
+  const username = req.params.username; // Assuming the username is passed in the request parameters
+
+  try {
+    // Find the user in the database by username
+    const user = await UserModel.findOne({ username: username });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
