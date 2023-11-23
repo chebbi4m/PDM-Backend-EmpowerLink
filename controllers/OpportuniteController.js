@@ -52,13 +52,30 @@ export const updateOpportunite = (req, res) => {
       res.status(500).json(err);
     });
 };
+export const getOpportuniteById = (req, res) => {
+  const opportuniteId = req.params.id;
 
-// Named export for default export
+  Opportunite.findById(opportuniteId)
+    .then(opportunite => {
+      if (!opportunite) {
+        res.status(404).json({ message: 'Opportunite not found' });
+      } else {
+        res.json(opportunite);
+      }
+    })
+    .catch(err => {
+      res.status(500).json(err);
+    });
+};
+
 const OpportuniteController = {
   getOpportunite,
   createOpportunite,
   deleteOpportunite,
   updateOpportunite,
+  getOpportuniteById,
 };
+
+// Named export for default export
 
 export default OpportuniteController;

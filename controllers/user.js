@@ -7,7 +7,7 @@ import { validationResult, check } from 'express-validator';
 import { MIME_TYPES } from "../middlewares/multer-config.js"
 
 import sendEmail from "../utils/sendEmail.js";
-
+  
 export const editProfile = async (req, res) => {
     const userId = req.body.userId; // Assuming the user ID is passed in the request body
     const { username, email, firstname, lastname, address, birthday, number,description } = req.body;
@@ -266,54 +266,10 @@ export const updateProfilePhoto = async (req, res) => {
   };*/
 
  // userController.js
-export const followUser = async (req, res) => {
-  const { UserId } = req.body; // Utilisez targetUserId pour éviter toute confusion avec le paramètre d'URL
-  const { _id } = req.user; // Utilisez req.user pour obtenir l'ID de l'utilisateur actuel
+ 
 
-  if (targetUserId === _id) {
-    return res.status(403).json("Action Forbidden");
-  }
 
-  try {
-    const targetUser = await UserModel.findById(UserId);
-    const currentUser = await UserModel.findById(_id);
 
-    if (!targetUser.followers.includes(_id)) {
-      await targetUser.updateOne({ $push: { followers: _id } });
-      await currentUser.updateOne({ $push: { following: UserId } });
-      res.status(200).json("User followed!");
-    } else {
-      res.status(403).json("You are already following this user");
-    }
-  } catch (error) {
-    console.log(error);
-    res.status(500).json(error);
-  }
-};
-
-export const unfollowUser = async (req, res) => {
-  const { targetUserId } = req.body; // Utilisez targetUserId pour éviter toute confusion avec le paramètre d'URL
-  const { _id } = req.user; // Utilisez req.user pour obtenir l'ID de l'utilisateur actuel
-
-  if (targetUserId === _id) {
-    return res.status(403).json("Action Forbidden");
-  }
-
-  try {
-    const targetUser = await UserModel.findById(targetUserId);
-    const currentUser = await UserModel.findById(_id);
-
-    if (targetUser.followers.includes(_id)) {
-      await targetUser.updateOne({ $pull: { followers: _id } });
-      await currentUser.updateOne({ $pull: { following: targetUserId } });
-      res.status(200).json("Unfollowed successfully!");
-    } else {
-      res.status(403).json("You are not following this user");
-    }
-  } catch (error) {
-    res.status(500).json(error);
-  }
-};
 export const addSkills = async (req, res) => {
   const userId = req.body.userId; // Assuming the user ID is passed in the request body
   const { skills } = req.body;
@@ -376,6 +332,75 @@ export const getUserByName = async (req, res) => {
     }
 
     res.status(200).json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+};
+export const followUser = async (req, res) => {
+  const userId = req.body.userId; // Assuming the user ID is passed in the request body
+  const targetUsername = req.body.username;
+
+  try {
+    // Find the user who wants to follow
+    const followerUser = await UserModel.findById(userId);
+    if (!followerUser) {
+      return res.status(404).json({ message: 'Follower user not found' });
+    }
+
+    // Find the user to be followed
+    const targetUser = await UserModel.findOne({ username: targetUsername });
+    if (!targetUser) {
+      return res.status(404).json({ message: 'Target user not found' });
+    }
+
+    // Check if the user is already following the target user
+    if (followerUser.following.includes(targetUser._id)) {
+      return res.status(400).json({ message: 'User is already following the target user' });
+    }
+
+    // Update the follower user's following list
+    followerUser.following.push(targetUser._id);
+    await followerUser.save();
+
+    // Update the target user's followers list
+    targetUser.followers.push(userId);
+    await targetUser.save();
+
+    res.status(200).json({ message: 'User followed successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+};
+export const countFollowers = async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const followersCount = user.followers.length;
+    res.status(200).json({ followersCount });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const countFollowing = async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const followingCount = user.following.length;
+    res.status(200).json({ followingCount });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: error.message });
