@@ -2,8 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import morgan from 'morgan';
 import cors from 'cors';
- 
-
+import session from 'express-session'
 import userRoutes from './routes/user.js'
 import servicesRoutes from './routes/serviceSociauxRoute.js'
 import ExperienceRoutes from './routes/experienceRouter.js'
@@ -15,6 +14,7 @@ import { errorHandler, notFoundError } from './middlewares/error_handler.js';
 import dotenv from 'dotenv';
 dotenv.config();
 const app = express();
+app.use(session({secret:'yoursecret', resave:false , saveUninitialized:false}))
 const port = process.env.PORT || 9090  ;
 const databaseName = 'pdm';
 mongoose.set('debug', true);
@@ -45,6 +45,7 @@ app.use((req,res,next)=>{
   import OpportuniteRoutes from './routes/OpportuniteRoutes.js'; 
 
   // Use the "Offreemploi" routes under the "/api" base path
+  
   app.use('/api', OpportuniteRoutes);
   app.use('/user', userRoutes);
   app.use("/service", servicesRoutes);

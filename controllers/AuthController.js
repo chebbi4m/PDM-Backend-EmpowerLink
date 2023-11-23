@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { validationResult } from 'express-validator';
 import passport from 'passport';
-import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+import GoogleStrategy from 'passport-google-oauth20';
 import express from 'express';
 import session from 'express-session';
 import sendEmail from "../utils/sendEmail.js";
@@ -111,48 +111,71 @@ export const loginUser = async (req, res) => {
 passport.use(
     new GoogleStrategy(
       {
-        clientID: 'votre_client_id',
-        clientSecret: 'votre_client_secret',
-        callbackURL: 'http://votre_domaine/auth/google/callback', // Assurez-vous de le configurer correctement sur la console Google Developer
+        clientID: '244005885594-2lau83gs84r77n3lgmlkj3ns2i336kli.apps.googleusercontent.com',
+        clientSecret: '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',
+        callbackURL: 'http://localhost:9090/user/google/callback', // Assurez-vous de le configurer correctement sur la console Google Developer
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
           // Vérifiez si l'utilisateur existe déjà dans la base de données
-          let user = await UserModel.findOne({ googleId: profile.id });
+          let user = await UserModel.findOne({email : profile.emails[0].value});
   
-          if (!user) {
-            // Si l'utilisateur n'existe pas, créez un nouvel utilisateur dans la base de données
-            user = new UserModel({
-              googleId: profile.id,
-              username: profile.displayName,
-              // Ajoutez d'autres champs que vous souhaitez récupérer depuis le profil Google
-            });
-  
-            await user.save();
+    
+          if (user ){
+            googleAuthSignin(user,accessToken,refreshToken,profile,done)
           }
-  
-          // Retournez l'utilisateur trouvé ou nouvellement créé
-          return done(null, user);
+      
         } catch (error) {
           return done(error, null);
         }
       }
     )
   );
+
+  const googleAuthSignin =  async(user,accessToken,refreshToken,profile,done ) =>{
+    return done(null,user);
+  };
   
   // Sérialisez l'utilisateur dans la session
   passport.serializeUser((user, done) => {
-    done(null, user.id);
+    done(null, user);
   });
   
   // Désérialisez l'utilisateur depuis la session
   passport.deserializeUser(async (id, done) => {
-    try {
-      const user = await UserModel.findById(id);
-      done(null, user);
-    } catch (error) {
-      done(error, null);
-    }
+   done (null,user)
   });
 
-
+ export const signInWithGoogle = async (req, res) => {
+    const user = req.user;
+    const token = jwt.sign({ userId: user._id , role: user.role,username: user.username,
+      email: user.email,
+      role: user.role,
+      description: user.description,
+      image: user.image, }, process.env.JWT_SECRET, { expiresIn: "30m" });
+    res.status(200).json({token}); 
+ 
+ };
+ export const verifyUserWithGoogle = async (req, res) => {
+  const googleIdToken = req.body.googleIdToken;
+   try{
+    const ticket = await client.verifyIdToken({
+      idToken: googleIdToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+   });
+    const payload = ticket.getPayload();
+    const email = payload.email;
+   
+    const user = await UserModel.findOne({ email: email });
+    if (!user) {
+      return res.status(400).json({ message: "Please sign up first !" });
+    }
+    if (user.banned === true) {
+      return res.status(400).json({ message: "Your account is banned ! Please contact the support." });
+    }
+    const token = jwt.sign({ userId: user._id , role: user.role }, process.env.JWT_SECRET, { expiresIn: "30m" });
+    res.status(200).json({token});
+}catch (error) {
+  res.status(400).json(error.message);
+}
+}
