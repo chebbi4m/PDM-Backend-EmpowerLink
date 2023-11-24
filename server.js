@@ -1,3 +1,5 @@
+// index.js
+
 import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
@@ -21,6 +23,9 @@ const databaseName = 'pdm';
 
 const server = http.createServer(app);
 const io = new Server(server);
+
+// Make io accessible globally
+global.io = io;
 
 mongoose.set('debug', true);
 mongoose.Promise = global.Promise;

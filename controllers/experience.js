@@ -1,46 +1,91 @@
 import experienceModel from '../models/experience.js';
-import { validationResult } from 'express-validator';
-import multer from '../middlewares/multer-config.js'; // Import your Multer configuration
-import { generateUniqueExperienceId } from './your-other-controller.js'; // Import your function
-
+import userModel from '../models/user.js';
+import nodemailer from 'nodemailer';
 
 export const createExperience = async (req, res) => {
+    console.log(req.body.communityId);
+
+    const { username, title, text, communityId } = req.body;
+    const image = req.file ? req.file.filename : '';
+
+    const experienceId = await generateUniqueExperienceId();
+
+    const newExperience = new experienceModel({
+        username,
+        communityId,
+        title,
+        text,
+        image,
+        experienceId,
+        createdAt: new Date(),
+    });
+
     try {
-      multer.single('image')(req, res, async function (err) {
-        if (err) {
-          console.error('Multer error:', err);
-          return res.status(400).json({ error: err, message: 'Image upload failed' });
-        }
-  
-        const { username, title, text, communityId } = req.body;
-        const image = req.file ? req.file.filename : '';
-  
-        const experienceId = await generateUniqueExperienceId();
-  
-        const newExperience = new experienceModel({
-          username,
-          communityId,
-          title,
-          text,
-          image,
-          experienceId,
-          createdAt: new Date(),
-        });
-  
         const savedExperience = await newExperience.save();
-  
+
         // Emit a socket event to notify connected clients
-        io.emit('newExperience', savedExperience);
-  
+        global.io.emit('newExperience', savedExperience);
+
+        // Check for mentions in the text
+        const mentions = extractMentionsFromText(text);
+
+        // Send emails to mentioned users
+        await sendEmailsToMentionedUsers(username, mentions);
+
         res.status(201).json({ message: 'Experience created successfully', experience: savedExperience });
-      });
     } catch (error) {
-      console.error('Create experience error:', error);
-      res.status(500).json({ message: error.message });
+        console.error('Error creating experience:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
     }
-  };
+};
 
+async function sendEmailsToMentionedUsers(senderUsername, mentions) {
+    try {
+        // Create a nodemailer transporter
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: 'chebbi.mohamed.1@esprit.tn', // Replace with your Gmail address
+                pass: '223JMT1915', // Replace with your Gmail password or an app-specific password
+            },
+        });
 
+        for (const mention of mentions) {
+            const mentionedUser = await userModel.findOne({ username: mention });
+
+            if (mentionedUser) {
+                // Compose email message
+                const mailOptions = {
+                    from: 'chebbi.mohamed.1@esprit.tn', // Replace with your Gmail address
+                    to: mentionedUser.email,
+                    subject: `You were mentioned by ${senderUsername}`,
+                    text: `Hey ${mentionedUser.username},\n\nYou were mentioned by ${senderUsername} in a new experience.`,
+                };
+
+                // Send email
+                transporter.sendMail(mailOptions, (error, info) => {
+                    if (error) {
+                        console.error('Error sending email:', error);
+                    } else {
+                        console.log(`Email sent to ${mentionedUser.email}: ${info.response}`);
+                    }
+                });
+            }
+        }
+    } catch (error) {
+        console.error('Error sending emails:', error);
+    }
+}
+
+function extractMentionsFromText(text) {
+    const mentionRegex = /@(\w+)(?=\s|$)/g;
+    const mentions = [];
+    let match;
+    while ((match = mentionRegex.exec(text)) !== null) {
+        mentions.push(match[1]);
+    }
+    return mentions;
+}
 
 async function generateUniqueExperienceId() {
     while (true) {

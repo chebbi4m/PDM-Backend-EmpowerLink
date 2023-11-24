@@ -2,9 +2,7 @@ import communityModel from "../models/community.js";
 import { validationResult } from 'express-validator';
 
 export const createCommunity = async (req, res) => {
-    console.log("aaaaaa")
     console.log(req.body.username)
-    console.log("aaaaaa")
      
     try {
         
@@ -13,14 +11,13 @@ export const createCommunity = async (req, res) => {
             name,
             category,
             objectif,
-            image
         } = req.body;
         const communityExists = await communityModel.findOne({ name });
 
         // Check if community name already exists
-        console.log("aaaaaa")
+        console.log("vvvv")
         console.log(req.body.username)
-        console.log("aaaaaa")
+        console.log("vvvv")
         
 
         if (communityExists) {
@@ -36,7 +33,6 @@ export const createCommunity = async (req, res) => {
             name,
             category,
             objectif,
-            image,
             communityId, // Add the community ID
             createdAt: new Date(), // Add the current timestamp
         });
