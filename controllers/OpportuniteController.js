@@ -1,5 +1,5 @@
 import Opportunite from '../models/OpportuniteModel.js';
-
+import mongoose from 'mongoose';
 export const getOpportunite = (req, res) => {
   Opportunite.find()
     .then(opportunite => {
@@ -67,7 +67,35 @@ export const getOpportuniteById = (req, res) => {
       res.status(500).json(err);
     });
 };
+export const applyToOpportunity = async (req, res) => {
+  const opportunityId = req.body.opportunityId;
+  const userId = req.body.userId;
 
+  try {
+    // Find the opportunity by ID
+    const opportunity = await Opportunite.findById(opportunityId);
+
+    if (!opportunity) {
+      return res.status(404).json({ message: 'Opportunity not found' });
+    }
+
+    // Check if the user ID is already in the applicants array
+    if (opportunity.applicants.includes(userId)) {
+      return res.status(400).json({ message: 'User already applied to this opportunity' });
+    }
+
+    // Add the user ID to the applicants array
+    opportunity.applicants.push(userId);
+
+    // Save the updated opportunity
+    await opportunity.save();
+
+    return res.status(200).json({ message: 'Application submitted successfully', opportunity });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
 
 const OpportuniteController = {
   getOpportunite,
@@ -75,6 +103,7 @@ const OpportuniteController = {
   deleteOpportunite,
   updateOpportunite,
   getOpportuniteById,
+  applyToOpportunity
 };
 
 // Named export for default export

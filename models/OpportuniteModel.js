@@ -5,8 +5,16 @@ const opportuniteModelSchema = new mongoose.Schema({
   description: String,
   lieu: String,
   Typedecontrat: String,
+  applicants: {
+    type: [String], // Array of strings
+    default: [] // Default value is an empty array
+  },
 });
 
 const Opportunite = mongoose.model('Opportunite', opportuniteModelSchema);
 
 export default Opportunite;
+
+opportuniteModelSchema.statics.getOpportuniteById = function (opportuniteId) {
+  return this.findById(opportuniteId).exec();
+};

@@ -4,7 +4,7 @@ import nodemailer from 'nodemailer';
 import { nanoid } from 'nanoid';
 import bcrypt from 'bcrypt';
 import { validationResult, check } from 'express-validator';
-import { MIME_TYPES } from "../middlewares/multer-config.js"
+import { MIME_TYPES } from "../middlewares/multer-config.js";
 
 import sendEmail from "../utils/sendEmail.js";
   

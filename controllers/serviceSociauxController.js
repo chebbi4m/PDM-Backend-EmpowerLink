@@ -26,7 +26,7 @@ const getServiceSociauxById = asyncHandler(async (req, res) => {
 // @route   POST /serviceSociaux
 // @access  private/admin
 const createServiceSociaux = asyncHandler(async (req, res) => {
-  const { nom, description, lieu, horaireOuverture } = req.body;
+  const { nom, description,nbParticipant  , lieu, horaireOuverture } = req.body;
 
   try {
     const newServiceSociaux = new ServiceSociaux({
@@ -34,7 +34,7 @@ const createServiceSociaux = asyncHandler(async (req, res) => {
       description,
       lieu,
       horaireOuverture,
-      nbParticipant,
+   
     });
 
     const savedServiceSociaux = await newServiceSociaux.save();
