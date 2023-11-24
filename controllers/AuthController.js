@@ -148,11 +148,7 @@ passport.use(
 
  export const signInWithGoogle = async (req, res) => {
     const user = req.user;
-    const token = jwt.sign({ userId: user._id , role: user.role,username: user.username,
-      email: user.email,
-      role: user.role,
-      description: user.description,
-      image: user.image, }, process.env.JWT_SECRET, { expiresIn: "30m" });
+    const token = jwt.sign({ userId: user._id , email: user.email }, process.env.JWT_SECRET, { expiresIn: "30m" });
     res.status(200).json({token}); 
  
  };

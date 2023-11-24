@@ -68,6 +68,7 @@ export const getOpportuniteById = (req, res) => {
     });
 };
 
+
 const OpportuniteController = {
   getOpportunite,
   createOpportunite,

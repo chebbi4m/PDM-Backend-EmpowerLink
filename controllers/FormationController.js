@@ -118,8 +118,8 @@ export const getAllformations = async (req, res) => {
   res.status(200).send(formations);
 };
 export const addParticipant = async (req, res) => {
-  const formationId = req.body.formationId; 
-  const userId = req.body.userId; 
+  const formationId = req.body.formationId;
+  const userId = req.body.userId;
 
   try {
     // Find the formation by ID
@@ -127,6 +127,11 @@ export const addParticipant = async (req, res) => {
 
     if (!formation) {
       return res.status(404).json({ message: 'Formation not found' });
+    }
+
+    // Check if the user ID is already in the participants array
+    if (formation.participants.includes(userId)) {
+      return res.status(400).json({ message: 'User already exists in participants' });
     }
 
     // Add the user ID to the participants array
@@ -138,7 +143,7 @@ export const addParticipant = async (req, res) => {
     // Save the updated formation
     await formation.save();
 
-    return res.status(200).json({message: 'Participant added successfully' ,formation});
+    return res.status(200).json({ message: 'Participant added successfully', formation });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Internal Server Error' });
