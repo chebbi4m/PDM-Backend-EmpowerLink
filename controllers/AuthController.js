@@ -51,7 +51,20 @@ export const registerUser = async (req, res) => {
 };
 
 
+export const getCurrentUser = async (req, res) => {
+  try {
+      if (!req.header("Authorization")) return res.status(401).json({ message: "Unauthorized" });
+      const token = req.header("Authorization").split(" ")[1];
+      const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+      const user = await UserModel.findById(decodedToken.userId).select("-password");
+      
+      if (!user) return res.status(404).json({ message: "User not found" });
 
+      res.status(200).json(user);
+  } catch (error) {
+      res.status(500).json({ message: error.message });
+  }
+};
 
     
 

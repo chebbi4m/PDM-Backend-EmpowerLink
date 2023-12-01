@@ -2,7 +2,7 @@ import express from 'express';
 import passport from 'passport';
 import upload from '../middlewares/multer-config.js'
 import { body } from 'express-validator';
-import { registerUser,loginUser,signInWithGoogle,verifyUserWithGoogle } from '../controllers/AuthController.js';
+import { registerUser,loginUser,signInWithGoogle,verifyUserWithGoogle,getCurrentUser } from '../controllers/AuthController.js';
 import {  editProfile,getAllUsers ,sendPasswordResetCode,changePassword,
     verifyResetCode,followUser, addSkills,getSkills,searchUsersByName,
     updateProfilePhoto,getUserByName,countFollowers,countFollowing} from '../controllers/user.js';
@@ -58,6 +58,9 @@ router.get('/get/:username', getUserByName);
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 router.get('/search', searchUsersByName);
+
+router.get('/getCurrentUser',getCurrentUser);
+
 
 router.post('/updateprofilephoto/:userId' , upload.single('profilePhoto'), updateProfilePhoto);
 // Ajoutez cette route pour la redirection après l'authentification Google
