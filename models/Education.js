@@ -14,6 +14,22 @@ const EducationSchema = new Schema(
       default: null,
       type: Number,
     },
+    isRecommended: {
+      default: null,
+      type: Boolean,
+    },
+    isTrending: {
+      default: null,
+      type: Boolean,
+    },
+    isPopular: {
+      default: null,
+      type: Boolean,
+    },
+    image: {
+      default: null,
+      type: String,
+    },
   },
   {
     timestamps: { currentTime: () => Date.now() },
