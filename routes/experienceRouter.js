@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.post('/createExperience', [
     body('username').notEmpty(),
-    body('communityId').notEmpty(),
+    // body('communityId').notEmpty(),
     body('title').notEmpty(),
     body('text').notEmpty(),
     body('image'),
