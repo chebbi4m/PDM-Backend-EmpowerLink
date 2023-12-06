@@ -1,6 +1,6 @@
 import express from 'express';
 import { body } from 'express-validator';
-import { createExperience, editExperience, deleteExperience, getExperienceById, getExperiences, getMyExperiences, getExperiencesByCommunity, getExperiencesSortedByDate } from '../controllers/experience.js'
+import { createExperience, editExperience, deleteExperience, getExperienceById, getExperiences, getMyExperiences, getExperiencesByCommunity, getExperiencesSortedByDate, getExperiencesByCommunityIOS } from '../controllers/experience.js'
 
 const router = express.Router();
 
@@ -35,5 +35,6 @@ router.get('/getExperiencesByCommunity/:communityId', getExperiencesByCommunity)
 
 router.get('/getExperiencesSortedByDate', getExperiencesSortedByDate);
 
+router.get('/getExperiencesByCommunityIOS', getExperiencesByCommunityIOS);
 
 export default router;

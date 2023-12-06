@@ -1,95 +1,48 @@
 import experienceModel from '../models/experience.js';
-import userModel from '../models/user.js';
-import nodemailer from 'nodemailer';
+import { validationResult } from 'express-validator';
+import multer from '../middlewares/multer-config.js'; // Import your Multer configuration
+import badWordsList  from '../public/statics/badwords.js';
 
 export const createExperience = async (req, res) => {
-    console.log(req.body.communityId);
-
-    const { username, title, text, communityId } = req.body;
-    const image = req.file ? req.file.filename : '';
-
-    const experienceId = await generateUniqueExperienceId();
-
-    const newExperience = new experienceModel({
-        username,
-        communityId,
-        title,
-        text,
-        image,
-        experienceId,
-        createdAt: new Date(),
-    });
-
     try {
-        const savedExperience = await newExperience.save();
+        multer.single('image')(req, res, async function (err) {
+            if (err) {
+                console.error('Multer error:', err);
+                return res.status(400).json({ error: err, message: 'Image upload failed' });
+            }
 
-        // Emit a socket event to notify connected clients
-        
+            const { username, title, text, communityId } = req.body;
+            const image = req.file ? req.file.filename : '';
 
-        // Check for mentions in the text
-        const mentions = extractMentionsFromText(text);
+            // Check for bad words in the text field
+            const filteredText = filterBadWords(text);
 
-        // Send emails to mentioned users
-        await sendEmailsToMentionedUsers(username, mentions);
+            const experienceId = await generateUniqueExperienceId();
 
-        res.status(201).json({ message: 'Experience created successfully', experience: savedExperience });
+            const newExperience = new experienceModel({
+                username,
+                communityId,
+                title,
+                text: filteredText, // Use the filtered text
+                image,
+                experienceId,
+                createdAt: new Date(),
+            });
+
+            const savedExperience = await newExperience.save();
+
+            res.status(201).json({ message: 'Experience created successfully', experience: savedExperience });
+        });
     } catch (error) {
-        console.error('Error creating experience:', error);
-        res.status(500).json({ message: 'Internal Server Error' });
+        console.error('Create experience error:', error);
+        res.status(500).json({ message: error.message });
     }
 };
 
-async function sendEmailsToMentionedUsers(senderUsername, mentions) {
-    try {
-        // Create a nodemailer transporter
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: 'chebbi.mohamed.1@esprit.tn', // Replace with your Gmail address
-                pass: '223JMT1915', // Replace with your Gmail password or an app-specific password
-            },
-        });
-
-        for (const mention of mentions) {
-            const mentionedUser = await userModel.findOne({ username: mention });
-
-            if (mentionedUser) {
-                // Compose email message
-                const mailOptions = {
-                    from: 'chebbi.mohamed.1@esprit.tn', // Replace with your Gmail address
-                    to: mentionedUser.email,
-                    subject: `You were mentioned by ${senderUsername}`,
-                    text:` Hey ${mentionedUser.username},\n\nYou were mentioned by ${senderUsername} in a new experience.`,
-                };
-
-                // Send email
-                transporter.sendMail(mailOptions, (error, info) => {
-                    if (error) {
-                        console.error('Error sending email:', error);
-                    } else {
-                        console.log(`Email sent to ${mentionedUser.email}: ${info.response}`);
-                    }
-                });
-            }
-        }
-    } catch (error) {
-        console.error('Error sending emails:', error);
-    }
-}
-
-function extractMentionsFromText(text) {
-    const mentionRegex = /@(\w+)(?=\s|$)/g;
-    const mentions = [];
-    let match;
-    while ((match = mentionRegex.exec(text)) !== null) {
-        mentions.push(match[1]);
-    }
-    return mentions;
-}
-
+// Function to generate unique experience ID
 async function generateUniqueExperienceId() {
     while (true) {
-        const uniqueExperienceId = Math.floor(1000 + Math.random() * 9000); 
+        const uniqueExperienceId = Math.floor(1000 + Math.random() * 9000);
         const experienceExists = await experienceModel.findOne({ experienceId: uniqueExperienceId });
         if (!experienceExists) {
             return uniqueExperienceId;
@@ -97,6 +50,17 @@ async function generateUniqueExperienceId() {
     }
 }
 
+// Function to filter bad words in the text
+function filterBadWords(text) {
+    let filteredText = text;
+
+    badWordsList.forEach((word) => {
+        const regex = new RegExp(`\\b${word}\\b`, 'gi');
+        filteredText = filteredText.replace(regex, '*'.repeat(word.length));
+    });
+
+    return filteredText;
+}
 
 export const editExperience = async (req, res) => {
     const { experienceId, title, text, image } = req.body;
@@ -175,9 +139,25 @@ export const getExperiencesByCommunity = async (req, res) => {
 
         // Send experiences array directly without wrapping
         res.status(200).json(experiences);
+        console.log(experiences,"aaaaa");
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+export const getExperiencesByCommunityIOS = async (req, res) => {
+    const communityId = req.params.communityId; // Update to use params instead of body
+    console.log(communityId)
+    try {
+        const experiences = await experienceModel.find({ communityyId: communityId });
+
+        // Send experiences array directly without wrapping
+        res.status(200).json(experiences);
         console.log(experiences);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+
+  
