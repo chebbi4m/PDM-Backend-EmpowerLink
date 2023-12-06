@@ -58,7 +58,7 @@ async function generateUniqueCommunityId() {
 
 
 export const editCommunity = async (req, res) => {
-    const { communityId, name, image } = req.body;
+    const { communityId, name, image, objectif, category } = req.body;
 
     try {
         const community = await communityModel.findOne({ communityId: communityId });
@@ -70,6 +70,8 @@ export const editCommunity = async (req, res) => {
 
         community.name = name || community.name;
         community.image = image || community.image;
+        community.objectif = objectif || community.objectif;
+        community.category = category || community.category;
 
         const newCommunity = await community.save();
 
@@ -98,6 +100,13 @@ export const deleteCommunity = async (req, res) => {
 export const getCommunityById = async (req, res) => {
     const communityId = req.body.groupId;
     const community = await communityModel.findOne({ communityId: communityId });
+    res.status(200).json({ community: community });
+}
+export const getCommunityByName = async (req, res) => {
+    console.log("body", req.body)
+    const communityName = req.body.name;
+    console.log("name", communityName)
+    const community = await communityModel.findOne({ name: communityName });
     res.status(200).json({ community: community });
 }
 export const getAllCommunities = async (req, res) => {

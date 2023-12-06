@@ -1,6 +1,6 @@
 import express from 'express';
 import { body } from 'express-validator';
-import { createCommunity, editCommunity, deleteCommunity, getCommunityById, getAllCommunities } from '../controllers/community.js'
+import { createCommunity, editCommunity, deleteCommunity, getCommunityById, getCommunityByName, getAllCommunities } from '../controllers/community.js'
 
 const router = express.Router();
 
@@ -15,7 +15,6 @@ router.post('/createCommunity', [
 router.post('/editCommunity', [
     body('groupId').notEmpty(),
     body('name'),
-    body('image'),
 ], editCommunity);
 
 router.post('/deleteCommunity', [
@@ -23,6 +22,8 @@ router.post('/deleteCommunity', [
 ], deleteCommunity);
 
 router.get('/getCommunityById',getCommunityById);
+
+router.post('/getCommunityByName',getCommunityByName);
 
 router.get('/getAllCommunities',getAllCommunities)
 
