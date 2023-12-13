@@ -7,7 +7,9 @@ import {
   updateServiceSociaux,
   addhopital,
 getServiceSociauxByNom,
-getServiceSociauByNom
+getServiceSociauByNom,
+addServiceSociaux,
+addServiceToServiceSociaux
 } from "../controllers/serviceSociauxController.js";
 
 const router = express.Router();
@@ -19,7 +21,8 @@ router.route("/edit/:id").put(updateServiceSociaux);
 router.route("/delete/:id").delete(deleteServiceSociaux);
 router.route("/nom/:nom").get(getServiceSociauxByNom);
 router.route("/getServiceSociauByNom/:nom").get(getServiceSociauByNom);
-
+router.post('/addService', addServiceSociaux);
+router.post('/addServicee', addServiceToServiceSociaux);
 
 
 

@@ -113,3 +113,36 @@ export const getAllCommunities = async (req, res) => {
     const community = await communityModel.find();
     res.status(200).json({ communities: community });
 }
+export const approveRequest = async (req, res) => {
+  try {
+    const { username, communityId } = req.body;
+
+    // Find the community by ID
+    const community = await communityModel.findOne({ communityId: communityId });
+
+    if (!community) {
+      return res.status(404).json({ message: 'Community not found' });
+    }
+
+    // Check if the username is in the pending list
+    const pendingIndex = community.pending.indexOf(username);
+
+    if (pendingIndex === -1) {
+      return res.status(400).json({ message: 'Username not found in pending requests' });
+    }
+
+    // Remove username from pending
+    community.pending.splice(pendingIndex, 1);
+
+    // Add username to members
+    community.members.push(username);
+
+    // Save the updated community
+    await community.save();
+
+    res.status(200).json({ message: 'Request approved' });
+  } catch (error) {
+    console.error('Error approving request:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};

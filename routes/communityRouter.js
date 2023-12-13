@@ -1,6 +1,6 @@
 import express from 'express';
 import { body } from 'express-validator';
-import { createCommunity, editCommunity, deleteCommunity, getCommunityById, getCommunityByName, getAllCommunities } from '../controllers/community.js'
+import { createCommunity, editCommunity, deleteCommunity ,approveRequest, getCommunityById, getCommunityByName, getAllCommunities } from '../controllers/community.js'
 
 const router = express.Router();
 
@@ -27,5 +27,6 @@ router.post('/getCommunityByName',getCommunityByName);
 
 router.get('/getAllCommunities',getAllCommunities)
 
+router.post('/approveRequest',approveRequest)
 
 export default router;

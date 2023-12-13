@@ -27,6 +27,13 @@ const serviceSociauxSchema = new Schema({
     type: String,
     required: false
   },
+  services: [
+    {
+      type: String,
+      required: false
+    }
+  ],
+  
   horaireOuverture: {
     type: Date, // Changement du type en Date
     required: false

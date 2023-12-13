@@ -6,8 +6,17 @@ import ServiceSociaux from "../models/serviceSociaux.js"; // Assurez-vous que le
 // @access  public
 const getServiceSociaux = asyncHandler(async (req, res) => {
   const serviceSociaux = await ServiceSociaux.find({});
+  
+  // Log the services for each ServiceSociaux
+  serviceSociaux.forEach(service => {
+    console.log(`Services for ${service.nom}: ${service.services}`);
+    // Change from `service.service` to `service.services`
+  });
+
   res.json(serviceSociaux);
 });
+
+
 
 // @desc    Fetch Service Sociaux by id
 // @route   GET /serviceSociaux/:id
@@ -140,6 +149,51 @@ const getServiceSociauByNom = asyncHandler(async (req, res) => {
     }
 
     res.status(200).json(serviceSociaux);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+export const addServiceSociaux = asyncHandler(async (req, res) => {
+  const { nom, description, lieu, horaireOuverture, nbPlace, nbParticipant, services } = req.body;
+  console.log(req.body);
+  try {
+    const newServiceSociaux = new ServiceSociaux({
+      nom,
+      description,
+      lieu,
+      horaireOuverture,
+      nbPlace,
+      nbParticipant,
+      services,
+    });
+    
+
+    const savedServiceSociaux = await newServiceSociaux.save();
+    res.status(201).json(savedServiceSociaux);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server Error");
+  }
+});
+export const addServiceToServiceSociaux = asyncHandler(async (req, res) => {
+  const { service } = req.body;
+  const { id } = req.body;
+
+  try {
+    const serviceSociaux = await ServiceSociaux.findById(id);
+
+    if (!serviceSociaux) {
+      return res.status(404).json({ message: "Service Sociaux not found" });
+    }
+
+    // Add the new service to the existing services array
+    serviceSociaux.services.push(service);
+
+    // Save the updated Service Sociaux
+    const updatedServiceSociaux = await serviceSociaux.save();
+
+    res.status(201).json(updatedServiceSociaux);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal Server Error" });
