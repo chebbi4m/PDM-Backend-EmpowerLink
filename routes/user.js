@@ -1,8 +1,13 @@
 import express from 'express';
+import passport from 'passport';
+import upload from '../middlewares/multer-config.js'
 import { body } from 'express-validator';
-import { registerUser,loginUser } from '../controllers/AuthController.js';
-import {  editProfile,getAllUsers ,sendPasswordResetCode,changePassword,verifyResetCode} from '../controllers/user.js';
+import { registerUser,loginUser,signInWithGoogle,verifyUserWithGoogle } from '../controllers/AuthController.js';
+import {  editProfile,getAllUsers ,sendPasswordResetCode,changePassword,
+    verifyResetCode,followUser, addSkills,getSkills,searchUsersByName,
+    updateProfilePhoto,getUserByName,countFollowers,countFollowing} from '../controllers/user.js';
 import { banUser, ban, checkBanned } from '../controllers/ban.js';
+
 
 const router = express.Router();
 
@@ -21,18 +26,47 @@ router.post('/login', [
 
 
 router.put(
-    '/users/:userId', editProfile);
+    '/editprofile', editProfile);
 router.get('/getuser',getAllUsers);
 
 
 router.post('/ForgetPassword', sendPasswordResetCode);
+
+
 router.get('/profile', checkBanned, (req, res) => {
     res.send('User Profile');
 });
+
+
 router.post('/:username/ban', banUser,ban);
+
+
 router.get('/checkBanned', checkBanned);
+
 router.post('/resetcode', verifyResetCode);
+
 router.post('/changerpassword', changePassword);
 
+router.post('/users/follow', followUser);
 
+router.post("/addskills", addSkills)
+
+router.get('/skills/:userId', getSkills);
+
+router.get('/get/:username', getUserByName);
+
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+router.get('/search', searchUsersByName);
+
+router.post('/updateprofilephoto/:userId' , upload.single('profilePhoto'), updateProfilePhoto);
+// Ajoutez cette route pour la redirection après l'authentification Google
+
+router.get('/google/callback', passport.authenticate('google', { failureRedirect: '/user/login' }),
+signInWithGoogle
+
+);
+router.post('/verifygoogle',verifyUserWithGoogle);
+router.get('/countFollowers/:userId', countFollowers);
+router.get('/countFollowing/:userId', countFollowing);
 export default router;

@@ -13,7 +13,7 @@ export const createEducation = async (req, res) => {
 
 export const getAllEducations = async (req, res) => {
   var educations = await Education.find();
-  res.status(200).send({ educations });
+  res.status(200).send(educations);
 };
 
 export const getEducationById = async (req, res) => {
