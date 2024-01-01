@@ -1,4 +1,6 @@
-import { Schema, model } from 'mongoose';
+import mongoose from "mongoose";
+
+const { Schema, model } = mongoose;
 
 const EducationSchema = new Schema(
   {
@@ -11,6 +13,10 @@ const EducationSchema = new Schema(
       type: String,
     },
     dure: {
+      default: null,
+      type: Number,
+    },
+    views: {
       default: null,
       type: Number,
     },

@@ -5,7 +5,7 @@ import { body } from 'express-validator';
 import { registerUser,loginUser,signInWithGoogle,verifyUserWithGoogle,getCurrentUser } from '../controllers/AuthController.js';
 import {  editProfile,getAllUsers ,sendPasswordResetCode,changePassword,
     verifyResetCode,followUser, addSkills,getSkills,searchUsersByName,
-    updateProfilePhoto,getUserByName,countFollowers,countFollowing , unfollowUser , resetPassword2} from '../controllers/user.js';
+    updateProfilePhoto,getUserByName,countFollowers,countFollowing , unfollowUser , resetPassword2,checkFollowStatus ,getFollowers,getfollowing} from '../controllers/user.js';
 import { banUser, ban, checkBanned , deleteAccount} from '../controllers/ban.js';
 
 
@@ -24,10 +24,12 @@ router.post('/login', [
     body('password').isLength({ min: 6 })
 ], loginUser);
 
-
+router.get('/getfollowers/:userId' , getFollowers);
+router.get('/getfollowing/:userId' , getfollowing);
 router.put(
     '/editprofile', editProfile);
 router.get('/getuser',getAllUsers);
+
 
 
 router.post('/ForgetPassword', sendPasswordResetCode);
@@ -76,5 +78,7 @@ router.get('/countFollowing/:userId', countFollowing);
 router.delete('/delete/:username', deleteAccount);
 router.post('/unfollow', unfollowUser);
 router.post('/pass', resetPassword2);
+
+router.post('/checkFollowStatus', checkFollowStatus);
 
 export default router;

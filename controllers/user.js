@@ -6,6 +6,7 @@ import { nanoid } from 'nanoid';
 import bcrypt from 'bcrypt';
 import { validationResult, check } from 'express-validator';
 import { MIME_TYPES } from "../middlewares/multer-config.js";
+import mongoose from 'mongoose';
 
 import sendEmail from "../utils/sendEmail.js";
   
@@ -415,7 +416,8 @@ export const getAllUsers = async (req, res) => {
       const user = await UserModel.findOne({ email: email });
   
       if (!user) {
-        return res.json({ error: 'User not found' });
+        return res.status(404).json({ error: 'User not found' });
+
       }
   
       const resetCode = generateRandomNumericCode(4);
@@ -704,9 +706,10 @@ export const followUser = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 export const countFollowers = async (req, res) => {
   const userId = req.params.userId;
-
+  //  print(followersCount)
   try {
     const user = await UserModel.findById(userId);
     if (!user) {
@@ -720,7 +723,42 @@ export const countFollowers = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+export const getfollowing = async (req, res) => {
+    const userId = req.params.userId;
+   // print(followersCount)
+    try {
+      const user = await UserModel.findById(userId);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      const followerIds = user.following;
+      const followers = await UserModel.find({ _id: { $in: followerIds } }, 'username');
+      res.status(200).json({ followers });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: error.message });
+    }
+  };
 
+  export const getFollowers = async (req, res) => {
+    let userId = req.params.userId;
+    userId = userId.trim(); // Trim leading and trailing spaces
+  
+    try {
+      const user = await UserModel.findById(userId);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      const followerIds = user.followers;
+      const followers = await UserModel.find({ _id: { $in: followerIds } }, 'username');
+      res.status(200).json({ followers });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: error.message });
+    }
+  };
 export const countFollowing = async (req, res) => {
   const userId = req.params.userId;
 
@@ -808,3 +846,30 @@ export const resetPassword2 = async (req, res) => {
       res.status(400).json(error.message);
     }
   };
+  export const checkFollowStatus = async (req, res) => {
+    const userId = req.body.userId; // Assuming the user ID is passed in the request body
+    const targetUsername = req.body.username;
+  
+    try {
+      // Find the user who wants to check follow status
+      const checkingUser = await UserModel.findById(userId);
+      if (!checkingUser) {
+        return res.status(404).json({ message: 'Checking user not found' });
+      }
+  
+      // Find the user to be checked for follow status
+      const targetUser = await UserModel.findOne({ username: targetUsername });
+      if (!targetUser) {
+        return res.status(404).json({ message: 'Target user not found' });
+      }
+  
+      // Check if the user is following the target user
+      const isFollowed = checkingUser.following.includes(targetUser._id);
+  
+      res.status(200).json({ isFollowed });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: error.message });
+    }
+  };
+  

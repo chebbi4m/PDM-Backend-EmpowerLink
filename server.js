@@ -14,6 +14,7 @@ import EducationRoute from './routes/Educations.js';
 import SoinsRoutes from './routes/soinRoutes.js'
 import { errorHandler, notFoundError } from './middlewares/error_handler.js';
 import dotenv from 'dotenv';
+import PaymentRouter from './routes/payment-router.js';
 
 
 dotenv.config();
@@ -63,6 +64,7 @@ app.use('/experience', ExperienceRoutes);
 app.use('/formation', FormationRoute);
 app.use('/education', EducationRoute);
 app.use("/soin",SoinsRoutes);
+app.use("/payment", PaymentRouter)
 
 app.use(errorHandler);
 app.use(notFoundError);

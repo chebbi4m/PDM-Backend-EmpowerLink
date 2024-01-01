@@ -10,6 +10,8 @@ import {
   getFormationsByUserId,
 } from '../controllers/FormationController.js';
 
+import {getAll, add, update,remove} from '../controllers/FormationBackOfficeController.js';
+
 import multer from 'multer';
 import path from 'path';
 
@@ -45,5 +47,10 @@ router.post('/addParticipant', addParticipant);
 
 router.put('/update', upload.single('image'), updateFormation);
 router.get('/formations', getFormationsByUserId);
+
+router.get('/back-office', getAll);
+router.post('/back-office', add);
+router.put('/back-office', update);
+router.delete('/back-office/:id', remove);
 
 export default router;
