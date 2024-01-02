@@ -7,7 +7,7 @@ import OpenAI from "openai";
 
 
 
-const apiKey = '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';
+const apiKey = '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';
 
 const openai = new OpenAI({ apiKey: apiKey });
 
@@ -21,21 +21,11 @@ export const createExperience = async (req, res) => { // Add 'io' as a parameter
   
         const { username, title, text, communityId } = req.body;
 
-        const filteredText = filterBadWords(text);
+        let filteredText = filterBadWords(text);
   
         const experienceId = await generateUniqueExperienceId();
   
-        const newExperience = new experienceModel({
-          username,
-          communityId,
-          title,
-          text: filteredText,
-          image: "no image",
-          experienceId,
-          createdAt: new Date(),
-        });
-  
-        const savedExperience = await newExperience.save();
+        
         const apiResponse = await callOpenAI(filteredText); // Pass filteredText to the API
   
         // Process the API response
@@ -44,10 +34,33 @@ export const createExperience = async (req, res) => { // Add 'io' as a parameter
           cleanedResponse = apiResponse.substring(5);
           if (cleanedResponse.startsWith("bad :")) {
             cleanedResponse = cleanedResponse.substring(5); // Remove "bad :" prefix
+            
           } // Remove "bad :" prefix
+          filteredText = "*****"
+        } else if (apiResponse.startsWith("bad:")) {
+            cleanedResponse = cleanedResponse.substring(5);
+            filteredText = "*****"
+        } else if (apiResponse.startsWith("Bad:")) {
+            cleanedResponse = cleanedResponse.substring(5);
+            filteredText = "*****"
+        } else if (apiResponse.startsWith("Bad :")) {
+            cleanedResponse = cleanedResponse.substring(5);
+            filteredText = "*****"
         } else if (apiResponse.startsWith("good :")) {
           cleanedResponse = ""; // Set to empty string for "good :" prefix
         }
+
+        const newExperience = new experienceModel({
+            username,
+            communityId,
+            title,
+            text: filteredText,
+            image: "no image",
+            experienceId,
+            createdAt: new Date(),
+          });
+    
+          const savedExperience = await newExperience.save();
   
         // Emit an event to notify about the new experience
         io.emit('newExperience', savedExperience);
@@ -166,7 +179,6 @@ export const getExperiencesByCommunity = async (req, res) => {
 
         // Send experiences array directly without wrapping
         res.status(200).json(experiences);
-        console.log(experiences,"aaaaa");
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
